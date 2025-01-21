@@ -6,7 +6,7 @@
 
 (require examples)
 
-;; ListaDeNúmeros -> Inteiro
+;; Lista(Número) -> Inteiro
 ;;
 ;; Determina a quantidade de elementos de uma lista de números.
 
