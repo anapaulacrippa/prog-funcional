@@ -6,7 +6,7 @@
 
 (require examples)
 
-;; Lista(String) -> String
+;; (list String) -> String
 ;;
 ;; Concatena todos os elementos de uma lista de strings.
 ;; Se a lista é vazia, devolve "".
@@ -22,7 +22,6 @@
 
 (define (concatena lst)
   (cond
-    [(empty? lst) ""] ; se a lista for vazia, nada a concatenar
-    [(empty? (rest lst)) (first lst)] ; se a lista só tem um elemento, devolve ele
+    [(empty? lst) ""]  ; lista vazia, nada a concatenar
     [else
      (string-append (first lst) (concatena (rest lst)))]))
