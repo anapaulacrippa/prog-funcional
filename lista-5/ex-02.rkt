@@ -6,7 +6,7 @@
 
 (require examples)
 
-;; ListaDeNúmeros -> Número
+;; Lista(Numero) -> Número
 ;;
 ;; Calcule o produto de todos os elementos de uma lista de números.
 ;; Se a lista é vazia, o produto é 1.
