@@ -8,8 +8,7 @@
 
 ;; Lista(String) -> Lista(String)
 ;;
-;; Remove todas as strings que não começam com A de uma lista de strings.
-
+;; Remove todas as strings que não começam com a letra "A" de uma lista de strings.
 
 (examples
  (check-equal? (remove-nao-A empty) '())
@@ -21,7 +20,7 @@
 (define (remove-nao-A lst)
   (cond
    [(empty? lst) '()]
-   [(equal? "A" (substring (first lst) 0 1)) ; se começa com A, insere na lista
+   [(equal? "A" (substring (first lst) 0 1))  ; se começa com A, insere na lista
     (cons (first lst) (remove-nao-A (rest lst)))]
-   [else ; se não começa com A, deve ser ignorado (passa o resto da lista)
+   [else  ; se não começa com A, deve ser ignorado
     (remove-nao-A (rest lst))]))
