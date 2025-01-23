@@ -21,6 +21,6 @@
 (define (verifica-true lst)
   (cond
     [(empty? lst) #t]
-    [(equal? (first lst) #f) #f]
+    [(false? (first lst)) #f]
     [else
      (verifica-true (rest lst))]))
