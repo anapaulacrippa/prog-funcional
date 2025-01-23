@@ -5,8 +5,9 @@
 #lang racket
 
 (require examples)
+(provide qtde-elem)
 
-;; Lista(Número) -> Inteiro
+;; Lista(Numero) -> Inteiro
 ;;
 ;; Determina a quantidade de elementos de uma lista de números.
 
