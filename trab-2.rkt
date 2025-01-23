@@ -95,33 +95,14 @@
 ; begin -> agrupa e executa múltiplas expressões, retornando o valor da última expressão executada
 
 
-(struct objeto (nome descricao interacao))
-;; nome: Identificação do objeto.
-;; descricao: Detalhes sobre o objeto.
-;; interacao: Ação que pode ser realizada (ex.: chave, alavanca).
+; interações possíveis com o objeto "Teclado Desgastado"
+(define (digitar-comando))
+(define (examinar-simbolos))
 
-(define teclado-desgastado (objeto "Teclado Desgastado"
-                                   "Descrição do Teclado Desgastado"
-                                   (list)))
-                                   ;(list digitar-comando examinar-simbolos)))
+; interações possíveis com o objeto "Painel de Controle"
+(define (reiniciar-sistema))
 
-(define painel-controle (objeto "Painel de Controle"
-                                "Descrição do Painel de Controle"
-                                (list)))
-                               ;(list reiniciar-sistema destrancar-data-center inserir-cod-acesso)))
-
-(define monitor-rede (objeto "Monitor de Rede"
-                             "Descrição do Monitor de Rede"
-                             (list)))
-                             ;(list consultar-historico explorar-vulnerabilidades)))
-
-;; ação que pode ser realizada
-;; inicia o enigma 1 -> decifrar criptografia de arquivo
-;(define (examinar-simbolos jogador)
-;  )
-
-;; só pode ser iniciado ao finalizar o enigma 3, ou seja, com a chave
-(define (destrancar-data-center jogador)
+(define (destrancar-data-center jogador) ; só pode ser iniciado ao finalizar o enigma 3, ou seja, com a chave
   (if (member "chave" (jogador-inventario jogador))
       (begin
         (displayln "O Data Center foi destrancado!")
@@ -132,6 +113,37 @@
         (displayln "Você precisa de uma chave para destrancar o Data Center.")
         jogador))) ; jogador e data-center não são alterados
 
+(define (inserir-cod-acesso))
+
+; interações possíveis com o objeto "Monitor de Rede"
+(define (consultar-historico))
+(define (explorar-vulnerabilidades))
+
+(struct objeto (nome descricao interacao) #:transparent)
+;; Um objeto é um  ...?
+;;   nome: Identificação do objeto.
+;;   descricao: Detalhes sobre o objeto.
+;;   interacao: Ação que pode ser realizada (ex.: chave, alavanca).
+
+(define teclado-desgastado (objeto "Teclado Desgastado"
+                                   "Descrição do Teclado Desgastado"
+                                   (list digitar-comando examinar-simbolos)))
+
+(define painel-controle (objeto "Painel de Controle"
+                                "Descrição do Painel de Controle"
+                                (list reiniciar-sistema destrancar-data-center inserir-cod-acesso)))
+
+(define monitor-rede (objeto "Monitor de Rede"
+                             "Descrição do Monitor de Rede"
+                             (list)))
+                             ;(list consultar-historico explorar-vulnerabilidades)))
+
+
+;; ação que pode ser realizada
+;; inicia o enigma 1 -> decifrar criptografia de arquivo
+;(define (examinar-simbolos jogador)
+;  )
+  
 (define (interagir objeto jogador)
   (cond
     [(string=? (objeto-interacao objeto) "chave")
@@ -140,13 +152,22 @@
          (displayln "Você precisa de uma chave!"))]
     [else (displayln "Nada acontece.")]))
 
-(struct ambiente (nome descricao objetos enigmas saida1 saida2 estado))
-;; nome: Nome do ambiente (ex.: "Sala de Controle").
-;; descricao: Texto descritivo do ambiente.
-;; objetos: Lista de objetos presentes.
-;; enigmas: Lista de enigmas associados ao ambiente.
-;; saida1, saida2: Direções possíveis para outros ambientes. --> TRANSFORMAR EM LISTA
-;; estado: Representação do status atual (#t = liberado ou #f = desbloqueado).
+(define (busca-objeto ambiente nome)
+  (let ((objetos (ambiente-objetos ambiente))) ; Obtém a lista de objetos do ambiente
+    (filter (lambda (objeto)
+              (string=? (string-upcase nome)
+                        (string-upcase (objeto-nome objeto))))
+            objetos))) ; Retorna a lista filtrada diretamente
+
+
+(struct ambiente (nome descricao objetos enigmas saida1 saida2 estado) #:transparent)
+;; Um ambiente é ..?
+;;   nome: Nome do ambiente (ex.: "Sala de Controle").
+;;   descricao: Texto descritivo do ambiente.
+;;   objetos: Lista de objetos presentes.
+;;   enigmas: Lista de enigmas associados ao ambiente.
+;;   saida1, saida2: Direções possíveis para outros ambientes. --> TRANSFORMAR EM LISTA
+;;   estado: Representação do status atual (#t = liberado ou #f = desbloqueado).
 
 (define sala-rival (ambiente "Sala do Hacker Rival" "Descrição da Sala do Hacker Rival"
                              (list ) ; objetos
@@ -173,7 +194,7 @@
                                    #f))
 
 (define data-center (ambiente "Data Center" "Descrição do Data Center"
-                              (list ) ; objetos
+                              (list teclado-desgastado painel-controle monitor-rede) ; objetos
                               (list arquivo-criptografado quebrar-senha explorar-vulnerabilidade) ; enigmas
                               lab-cripto #f
                               #f))
@@ -198,7 +219,11 @@
   (displayln "Você vê os seguintes objetos:")
   (for-each displayln (map objeto-nome (ambiente-objetos ambiente)))
   (displayln "Digite o nome do objeto que deseja explorar")
-  (filter (string-upcase (read-line)) (ambiente-objetos ambiente)))
+  (define obj (first (busca-objeto ambiente (read-line)))) ; acessa o objeto a ser explorado
+  (displayln "Você tem as possíveis interações:")
+  (for-each displayln (map objeto-interacoes obj))
+  )
+  
   ;(displayln "Saídas disponíveis:")
   ;(for-each displayln (ambiente-saidas ambiente)))
 
