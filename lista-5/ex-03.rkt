@@ -22,4 +22,4 @@
   (cond
     [(empty? lst) 0]
     [else
-     (+ 1 (qtde-elem (rest lst)))]))
+     (add1 (qtde-elem (rest lst)))]))
