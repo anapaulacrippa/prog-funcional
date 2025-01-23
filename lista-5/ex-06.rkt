@@ -20,7 +20,7 @@
 (define (remove-nulos lst)
   (cond
    [(empty? lst) '()]
-   [(not (equal? 0 (first lst)))  ; se for diferente de 0, insere na lista
+   [(not (zero? (first lst)))  ; se for diferente de 0, insere na lista
     (cons (first lst) (remove-nulos (rest lst)))]
    [else  ; se for igual a 0, deve ser ignorado 
     (remove-nulos (rest lst))]))
