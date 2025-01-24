@@ -6,6 +6,8 @@
 
 (require examples)
 
+;; Número  Número Natural -> Número
+;;
 ;; Recebe como entrada um número a (diferente de 0) e um número natural n e
 ;; calcula o valor a elevado a n.
 
