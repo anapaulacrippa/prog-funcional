@@ -5,6 +5,7 @@
 #lang racket
 
 (require examples)
+(provide divisores)
 
 ;; Número Natural  Número Natural -> (list Número Natural)
 ;;
