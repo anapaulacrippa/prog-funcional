@@ -153,6 +153,51 @@
   ;(define player (jogador (jogador-nome jogador) (append (jogador-inventario jogador) novo-obj) (jogador-pontos-vida jogador) (jogador-localizacao jogador)))
   ;)
 
+;; Função genérica que atualiza campos de uma determinada struct 
+(define (atualiza campo struct novo-valor)
+  (cond
+    [(jogador? struct)
+     (cond
+       [(equal? campo 'nome)
+        (if (string=? (jogador-nome struct) "")
+            (let ([jogador-atualizado (struct-copy jogador struct
+                                                    [nome novo-valor])])
+              jogador-atualizado)
+            struct)] ; se o nome não for vazio, ou seja, se já foi modificado antes, ele retorna a struct como está
+       
+       [(equal? campo 'inventario)
+        (let ([jogador-atualizado (struct-copy jogador struct
+                                               [inventario (append (jogador-inventario struct) (list novo-valor))])])
+          jogador-atualizado)]
+       
+       [(equal? campo 'localizacao)
+        (let ([jogador-atualizado (struct-copy jogador struct
+                                               [localizacao novo-valor])])
+          jogador-atualizado)]
+       
+       [else (error "Campo não existente na struct jogador.")])]
+
+    [(ambiente? struct)
+     (cond
+       [(equal? campo 'objetos)
+        (let ([ambiente-atualizado (struct-copy ambiente struct
+                                                [objetos novo-valor])])
+          ambiente-atualizado)]
+       
+       [(equal? campo 'enigmas)
+        (let ([ambiente-atualizado (struct-copy ambiente struct
+                                                [enigmas novo-valor])])
+          ambiente-atualizado)]
+       
+       [(equal? campo 'estado)
+        (let ([ambiente-atualizado (struct-copy ambiente struct
+                                                [estado novo-valor])])
+          ambiente-atualizado)]
+       
+       [else (error "Campo não existente na struct ambiente.")])]
+
+    [else (error "Tipo de struct não existente.")]))
+
 
 ; (define p (iniciar-enigma arquivo-criptografado player))
 
