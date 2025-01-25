@@ -156,48 +156,52 @@
 ;; Função genérica que atualiza campos de uma determinada struct 
 (define (atualiza campo struct novo-valor)
   (cond
-    [(jogador? struct)
-     (cond
-       [(equal? campo 'nome)
-        (if (string=? (jogador-nome struct) "")
-            (let ([jogador-atualizado (struct-copy jogador struct
+    [(equal? campo 'nome)
+     (let ([jogador-atualizado (struct-copy jogador struct
                                                     [nome novo-valor])])
-              jogador-atualizado)
-            struct)] ; se o nome não for vazio, ou seja, se já foi modificado antes, ele retorna a struct como está
-       
-       [(equal? campo 'inventario)
-        (let ([jogador-atualizado (struct-copy jogador struct
+              jogador-atualizado)]
+    
+    [(equal? campo 'inventario)
+     (let ([jogador-atualizado (struct-copy jogador struct
                                                [inventario (append (jogador-inventario struct) (list novo-valor))])])
           jogador-atualizado)]
-       
-       [(equal? campo 'localizacao)
-        (let ([jogador-atualizado (struct-copy jogador struct
+
+    [(equal? campo 'localizacao)
+     (let ([jogador-atualizado (struct-copy jogador struct
                                                [localizacao novo-valor])])
           jogador-atualizado)]
-       
-       [else (error "Campo não existente na struct jogador.")])]
 
-    [(ambiente? struct)
-     (cond
-       [(equal? campo 'objetos)
-        (let ([ambiente-atualizado (struct-copy ambiente struct
+    [(equal? campo 'objetos)
+     (let ([ambiente-atualizado (struct-copy ambiente struct
                                                 [objetos novo-valor])])
           ambiente-atualizado)]
-       
-       [(equal? campo 'enigmas)
-        (let ([ambiente-atualizado (struct-copy ambiente struct
+
+    [(equal? campo 'enigmas)
+     (let ([ambiente-atualizado (struct-copy ambiente struct
                                                 [enigmas novo-valor])])
           ambiente-atualizado)]
-       
-       [(equal? campo 'estado)
-        (let ([ambiente-atualizado (struct-copy ambiente struct
+
+    [(equal? campo 'estado)
+     (let ([ambiente-atualizado (struct-copy ambiente struct
                                                 [estado novo-valor])])
-          ambiente-atualizado)]
-       
-       [else (error "Campo não existente na struct ambiente.")])]
+          ambiente-atualizado)]))
+     
+;; Casos de teste da função 'atualiza'
+(define player (jogador "" '() 10 "Sala de Controle"))
+(define player1 (atualiza 'nome player "Alice"))
+(define player3 (atualiza 'inventario player1 "Chave"))
+(define player4 (atualiza 'localizacao player3 "Data Center"))
 
-    [else (error "Tipo de struct não existente.")]))
+(define lugar (ambiente "Ponto de Partida" "Sala de análises e monitoramentos" '("Mesa") '("Enigma 1") "Porão de Energia" "Data Center" #f))
+(define lugar1 (atualiza 'objetos lugar '("Mesa" "Computador")))
+(define lugar2 (atualiza 'estado lugar1 #t))
 
+(examples
+  (check-equal? player1 (jogador "Alice" '() 10 "Sala de Controle"))
+  (check-equal? player3 (jogador "Alice" '("Chave") 10 "Sala de Controle"))
+  (check-equal? player4 (jogador "Alice" '("Chave") 10 "Data Center"))
+  (check-equal? lugar1 (ambiente "Ponto de Partida" "Sala de análises e monitoramentos" '("Mesa" "Computador") '("Enigma 1") "Porão de Energia" "Data Center" #f))
+  (check-equal? lugar2 (ambiente "Ponto de Partida" "Sala de análises e monitoramentos" '("Mesa" "Computador") '("Enigma 1") "Porão de Energia" "Data Center" #t)))
 
 ; (define p (iniciar-enigma arquivo-criptografado player))
 
