@@ -213,21 +213,57 @@
 ;;   descricao: Detalhes sobre o objeto.
 ;;   interacao: Ação que pode ser realizada (ex.: chave, alavanca).
 
-(define teclado-desgastado (objeto "Teclado Desgastado"
-                                   "Descrição do Teclado Desgastado"
-                                   (list "ana" "paula")))
-                                   ;(list digitar-comando examinar-simbolos)))
+(define teclado-desgastado (objeto "Teclado Desgastado" 
+                                   "Um teclado velho e usado, com algumas teclas apagadas. Pode ser útil para inserir comandos." 
+                                   (list))) ;(list digitar-comando examinar-simbolos)))
 
-(define painel-controle (objeto "Painel de Controle"
-                                "Descrição do Painel de Controle"
-                                (list)))
-                                ;(list reiniciar-sistema destrancar-data-center inserir-cod-acesso)))
+(define painel-controle (objeto "Painel de Controle" 
+                                "Um painel com diversas luzes e botões. Ele monitora e gerencia o acesso ao sistema." 
+                                (list))) ;(list reiniciar-sistema destrancar-data-center inserir-cod-acesso)))
 
-(define monitor-rede (objeto "Monitor de Rede"
-                             "Descrição do Monitor de Rede"
-                             (list)))
-                             ;(list consultar-historico explorar-vulnerabilidades)))
+(define monitor-rede (objeto "Monitor de Rede" 
+                             "Um monitor que exibe conexões de rede e informações em tempo real." 
+                             (list))) ;(list consultar-historico explorar-vulnerabilidades)))
 
+(define servidor-principal (objeto "Servidor Principal" 
+                                   "A peça central do sistema. Um terminal exibe informações críticas e opções avançadas de acesso." 
+                                   (list))) ;(list insepcionar-logs descripto-senha)))
+
+(define estacao-trabalho (objeto "Estação de Trabalho" 
+                                 "Uma estação com múltiplos monitores exibindo gráficos, logs de rede e alertas de segurança." 
+                                 (list))) ;(list analisar-trafego identificar-anomalos)))
+
+(define cabos-soltos (objeto "Cabos Soltos"
+                             "Cabos espalhados pela sala, parcialmente desconectados. Eles fazem parte de um sistema mais complexo, devem ser ligados na sequência certa." 
+                             (list))) ;(list reconectar-cabos)
+
+(define painel-controle-energia (objeto "Painel de Controle de Energia"
+                                        "Um painel de controle com diversos botões e luzes piscando. Para um sistema de energia instável, o painel é a chave para restaurar a energia." 
+                                        (list))) ;(list restaurar-energia)))
+
+(define gerador-principal (objeto "Gerador Principal"
+                                  "O gerador garante o fornecimento de energia sempre que há falhas na corrente elétrica, assegurando a continuidade do sistema." 
+                                  (list))) ;(list restaurar-gerador)))
+
+(define computadores-especializados (objeto "Computadores Especializados"
+                                            "Uma estação de computadores com software avançado projetada para tarefas de criptografia e análise de dados."
+                                            (list))) ;(list acessar-ferramentas-cripto decifrar-mensagem-cifrada)))
+
+(define livros-criptografia (objeto "Livros de Criptografia"
+                                    "Uma coleção de livros e manuais detalhando técnicas e algoritmos criptográficos, tanto clássicos quanto modernos."
+                                    (list))) ;(list consultar-livros buscar-tecnica-cripto)))
+
+(define quadro-branco (objeto "Quadro Branco com Anotações"
+                              "Um quadro branco cheio de anotações."
+                              (list))) ;(list analisar-anotacoes resolver-quebra-cabeca)))
+
+(define computador-rival (objeto "Computador do Rival"
+                                 "Um computador altamente protegido, com várias camadas de segurança. O sistema precisa ser acessado para desativar o controle do hacker rival."
+                                 (list))) ;(list quebrar-senha desativar-sistema)))
+
+(define telas-monitoramento (objeto "Telas de Monitoramento"
+                                    "Uma série de telas mostrando dados do sistema e da rede. Elas escondem informações cruciais."
+                                    (list))) ;(list resgatar-arquivo)))
 
 ;; ação que pode ser realizada
 ;; inicia o enigma 1 -> decifrar criptografia de arquivo
