@@ -116,14 +116,13 @@
                                         "Sistema desativado com sucesso! O computador está desligado." 
                                         (list "Comando correto para desligar o sistema")))
 
-(define enigma-final (enigma "O último obstáculo é um painel de monitoramento que exibe uma sequência numérica aparentemente aleatória. O sistema está esperando uma senha para liberar a próxima etapa. Para descobrir a senha, você deve interpretar o padrão oculto na sequência apresentada na tela de monitoramento.\n\n-------------- TELA DE MONITORAMENTO ---------------\n|   2   |   4   |   8   |   16   |   32   |   64   |\n----------------------------------------------------\nO sistema está aguardando a próxima entrada na sequência." 
+(define enigma-final (enigma "O destino da missão está em suas mãos. O painel de monitoramento brilha com uma sequência numérica que parece aleatória, mas você sabe que ali se esconde a chave para acessar um arquivo crucial. Este é o último obstáculo. O tempo é curto e em breve o acesso ao painel de monitoramento será bloqueado. Você precisa decifrar o padrão escondido na sequência e inserir a resposta antes que seja tarde demais.\n\n-------------- TELA DE MONITORAMENTO ---------------\n|   2   |   4   |   8   |   16   |   32   |   64   |\n----------------------------------------------------\nO sistema está aguardando a próxima entrada na sequência." 
                              "128" 
                              (list "1: Cada número é o dobro do anterior. Pense em como as máquinas armazenam e processam dados." 
                                    "2: A sequência parece simples, mas o próximo número será o próximo na linha, seguindo uma progressão de duplicação." 
                                    "3: Os computadores adoram potências de dois. O que vem depois de 64?") 
                              "Parabéns, você decifrou o último enigma! O arquivo crucial foi recuperado e o sistema do hacker rival foi desativado. Você completou sua missão com sucesso!" 
-                             (list "Arquivo recuperado")))
-
+                             (list "Troféu Chave-Mestra da Rede")))
 
 ; ao imprimir a descrição do enigma, para respeitar as quebras de linhas, utilizar o método display
 ; (display (enigma-descricao arquivo-criptografado))
