@@ -162,9 +162,11 @@
               jogador-atualizado)]
     
     [(equal? campo 'inventario)
-     (let ([jogador-atualizado (struct-copy jogador struct
-                                               [inventario (append (jogador-inventario struct) (list novo-valor))])])
-          jogador-atualizado)]
+     (let ([jogador-atualizado
+            (if (member novo-valor (jogador-inventario struct))  ; se o item já estiver no inventário, remove
+                (struct-copy jogador struct [inventario (filter (λ (item) (not (equal? item novo-valor))) (jogador-inventario struct))]) 
+                (struct-copy jogador struct [inventario (append (jogador-inventario struct) (list novo-valor))]))]) ; caso contrário, adiciona o item
+       jogador-atualizado)]
 
     [(equal? campo 'localizacao)
      (let ([jogador-atualizado (struct-copy jogador struct
