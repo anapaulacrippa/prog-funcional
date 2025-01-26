@@ -1,7 +1,7 @@
 #lang racket
 
 (require "tad.rkt")
-(require "novo-hacker.rkt")
+(require "trab-2.rkt")
 (provide (all-defined-out))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -9,87 +9,78 @@
 ;; Interações
 
 ;; Interações possíveis com o objeto "Teclado Desgastado"
-(define (digitar-comando jogador ambiente)
-  (displayln "Você está digitando um comando..."))
-
 (define (examinar-simbolos jogador ambiente)
-  (displayln "Examinando os símbolos no teclado..."))
-
+  (displayln "Examinando os símbolos no teclado...")
+  (iniciar-enigma arquivo-criptografado jogador))
+  
 
 ;; Interações possíveis com o objeto "Painel de Controle"
-(define (reiniciar-sistema jogador ambiente)
-  (displayln "Sistema reiniciado com sucesso."))
-
-(define (destrancar-data-center jogador ambiente) ; só pode ser iniciado ao finalizar o enigma 3, ou seja, com a chave
+(define (destrancar-data-center jogador ambiente)
   (if (member "Chave Data Center" (jogador-inventario jogador)) 
       (begin
-        (let ([jogador-atualizado 
-               (atualiza 'inventario jogador "Chave Data Center")]) ; remove a chave do inventário
-          (let ([jogador-atualizado-completo
-                 (atualiza 'inventario jogador-atualizado "http://din.uem.br")]) ; remove o site do Din do inventário
-            (let ([jogador-atualizado-final
-                   (atualiza 'inventario jogador-atualizado-completo "Senha do arquivo")]) ; remove a "senha do arquivo"
-              (let ([ambiente-atualizado 
-                     (atualiza 'estado ambiente #t)]) 
-                (displayln "O item 'Chave Data Center' foi removido do seu inventário")
-                (displayln "O Data Center foi destrancado!")
-                (list jogador-atualizado-final ambiente-atualizado))))))
+        (let* ([jogador-atualizado 
+                (atualiza 'inventario jogador "Chave Data Center")] ; remove a chave do inventário
+               [jogador-atualizado-completo
+                (atualiza 'inventario jogador-atualizado "http://din.uem.br")] ; remove o site do Din do inventário
+               [jogador-atualizado-final
+                (atualiza 'inventario jogador-atualizado-completo "Senha do arquivo")] ; remove a "senha do arquivo"
+               [ambiente-atualizado 
+                (atualiza 'estado ambiente #t)]) ; atualiza o estado do ambiente
+          (displayln "O item 'Chave Data Center' foi removido do seu inventário")
+          (displayln "O Data Center foi destrancado!")
+          (list jogador-atualizado-final ambiente-atualizado)))
       (begin
         (displayln "Você precisa de uma chave para destrancar o Data Center.")
         (list jogador ambiente)))) ; jogador e data-center não são alterados
 
+
 (define (inserir-cod-acesso jogador ambiente)
   (if (member "Senha do arquivo" (jogador-inventario jogador))
       (begin
-        (let ([jogador-atualizado 
-               (atualiza 'inventario jogador "Senha do arquivo")]) 
-          (displayln "Inserindo código de acesso...")
-          (displayln "Arquivo desbloqueado com sucesso.")
-          (list jogador-atualizado)))
+        (displayln "Inserindo código de acesso...")
+        (displayln "Arquivo desbloqueado com sucesso.")
+        (iniciar-enigma quebrar-senha jogador)) 
       (begin
         (displayln "Você precisa da senha do arquivo para desbloqueá-lo.")
-        (list jogador ambiente)))) ; caso o jogador não tenha a senha, nada muda
-           
-     
-;; Interações possíveis com o objeto "Monitor de Rede"
-(define (consultar-historico jogador ambiente)
-  (displayln "Consultando histórico de rede..."))
+        (list jogador ambiente)))) 
 
+           
+;; Interações possíveis com o objeto "Monitor de Rede"
 (define (explorar-vulnerabilidades jogador ambiente)
   (if (member "http://din.uem.br" (jogador-inventario jogador))
       (begin
-        (displayln "Explorando vulnerabilidades...")) 
+        (displayln "Explorando vulnerabilidades...")
+        (iniciar-enigma explorar-vulnerabilidade jogador))
       (begin
-        (displayln "Você precisa do 'site do Din' no seu inventário para explorar vulnerabilidades.")
+        (displayln "Você precisa do 'http://din.uem.br' no seu inventário para explorar vulnerabilidades.")
         (list jogador ambiente)))) ; Caso o jogador não tenha o item, nada muda
 
 
-
 ;; Interações possíveis com o objeto "Servidor Principal"
-(define (inspecionar-logs jogador ambiente)
-  (displayln "Inspecionando logs do servidor..."))
-
 (define (descripto-senha jogador ambiente)
-  (displayln "Descriptografando senha..."))
+  (displayln "Descriptografando senha...")
+  (iniciar-enigma descriptografar-senha jogador))
 
 
 ;; Interações possíveis com o objeto "Estação de Trabalho"
 (define (analisar-trafego jogador ambiente)
-  (displayln "Analisando tráfego de rede..."))
+  (displayln "Analisando tráfego de rede...")
+  (iniciar-enigma reconhecimento-ip jogador))
 
 (define (identificar-anomalos jogador ambiente)
   (if (member "IP Anômalo" (jogador-inventario jogador))
       (begin
-        (let ([jogador-atualizado 
-               (atualiza 'inventario jogador "IP Anômalo")]) ; remove IP Anômalo
-          (let ([jogador-atualizado-completo
-                 (atualiza 'inventario jogador-atualizado "IP Local")]) ; remove IP Local
-            (let ([jogador-atualizado-final
-                   (atualiza 'inventario jogador-atualizado-completo "Senha do servidor")]) ; remove Senha do servidor
-              (list jogador-atualizado-final ambiente))))) ; caso tenha "IP Anômalo"
+        (let* ([jogador-atualizado 
+                (atualiza 'inventario jogador "IP Anômalo")] ; remove IP Anômalo
+               [jogador-atualizado-completo
+                (atualiza 'inventario jogador-atualizado "IP Local")] ; remove IP Local
+               [jogador-atualizado-final
+                (atualiza 'inventario jogador-atualizado-completo "Senha do servidor")]) ; remove Senha do servidor
+          (list jogador-atualizado-final ambiente))) ; retorna o jogador atualizado e o ambiente
       (begin
-        (displayln "Nenhum IP Anômalo encontrado.") ; caso não tenha "IP Anômalo"
-        (list jogador ambiente)))) ; retorna o jogador e ambiente inalterados
+        (displayln "Nenhum IP Anômalo encontrado.") 
+        (list jogador ambiente)))) 
+
 
 ;; Interações possíveis com o objeto "Cabos Soltos"
 (define (reconectar-cabos jogador ambiente)
