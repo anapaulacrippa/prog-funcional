@@ -36,11 +36,28 @@
 ;;   saida1, saida2: ambiente | Boolean - direções possíveis para outros ambientes. Caso não haja saídas disponíveis, representado por #f.
 ;;   estado        : Boolean            - status atual do ambiente (#t para acesso liberado ou #f para acesso desbloqueado).
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Instâncias
+;; Instâncias por ambientes
 
-;; Enigmas
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; (1) SALA DE CONTROLE
+
+(define teclado-desgastado (objeto "Teclado Desgastado" "Um teclado velho e usado, com algumas teclas apagadas. Pode ser útil para inserir comandos."
+                                   (list examinar-simbolos)))
+
+;; Jogador  Ambiente -> Enigma | Jogador
+;;
+;; Representa a interações possível com o objeto "Teclado Desgastado".
+;; Inicia o enigma "Arquivo Criptografado"
+
+(define (examinar-simbolos jogador ambiente)
+  (displayln "Examinando os símbolos no teclado...") (iniciar-enigma arquivo-criptografado jogador))
+
 (define arquivo-criptografado (enigma "Cada letra carrega o peso de algo repetido infinitas vezes...\n\n‘     1    2   3    4   5   6   7   8   9   0  -  =  backspace\ntab   _   W   E   _  T   Y   U   I   O   P   ́  [   enter\ncapslock  A  S  D   _   _    H   _   K   _  Ç  ~   ]\nshift \\   Z   X   C   V   B   N   M   ,   .   /  shift\nctrl   fn   alt          space         ctrl    /"
                                       "CODING"
                                       (list "1:\n'Cada tecla desgastada do teclado é uma peça do quebra-cabeça. Mas cuidado com\nas armadilhas! Nem todas as letras estão onde parecem estar.'"
@@ -49,6 +66,25 @@
                                       "Acesso ao arquivo desbloqueado!\nA senha foi adicionada ao seu inventário."
                                       (list "Senha do arquivo")))
 
+(define painel-controle (objeto "Painel de Controle" 
+                                "Um painel com diversas luzes e botões. Ele monitora e gerencia o acesso ao sistema." 
+                                (list inserir-cod-acesso destrancar-data-center)))
+
+;; Jogador Ambiente -> (list Jogador Ambiente)
+;;
+;; Representa uma interação possível com o objeto "Painel de Controle".
+;; Inicia o enigma "Quebrar Senha".
+
+(define (inserir-cod-acesso jogador ambiente)
+  (if (member "Senha do arquivo" (jogador-inventario jogador))
+      (begin
+        (displayln "Inserindo código de acesso...")
+        (displayln "Arquivo desbloqueado com sucesso.")
+        (iniciar-enigma quebrar-senha jogador)) 
+      (begin
+        (displayln "Você precisa da senha do arquivo para desbloqueá-lo.")
+        (list jogador ambiente))))
+
 (define quebrar-senha (enigma "Esse arquivo contém o endereço para um local conhecido, mas inseguro…\nsggk://wrm.fvn.yi"
                               "http://din.uem.br"
                               (list "1: Quando as coisas parecem estar fora de ordem, lembre-se: às vezes, reverter é a chave para o progresso."
@@ -56,6 +92,36 @@
                                     "3: No espelho, a ordem se inverte. Tente olhar para o alfabeto de um outro lado.")
                               "adiciona o endereço do site do DIN ao inventário do jogador"
                               (list "Endereço do site do DIN")))
+
+;; Jogador  Ambiente -> (list Jogador Ambiente)
+;;
+;; Representa uma interação possível com o objeto "Painel de Controle".
+
+(define (destrancar-data-center jogador ambiente)
+  (if (member "Chave Data Center" (jogador-inventario jogador)) 
+      (begin
+        (let* ([jogador-atualizado 
+                (atualiza 'inventario jogador "Chave Data Center")] ; remove a chave do inventário
+               [jogador-atualizado-completo
+                (atualiza 'inventario jogador-atualizado "http://din.uem.br")] ; remove o site do Din do inventário
+               [jogador-atualizado-final
+                (atualiza 'inventario jogador-atualizado-completo "Senha do arquivo")] ; remove a "senha do arquivo"
+               [ambiente-atualizado 
+                (atualiza 'estado ambiente #t)]) ; atualiza o estado do ambiente
+          (displayln "O item 'Chave Data Center' foi removido do seu inventário")
+          (displayln "O Data Center foi destrancado!")
+          (list jogador-atualizado-final ambiente-atualizado)))
+      (begin
+        (displayln "Você precisa de uma chave para destrancar o Data Center.")
+        (list jogador ambiente)))) ; jogador e data-center não são alterados
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; (2) DATA CENTER
+
+
+;; Enigmas
+
 
 (define explorar-vulnerabilidade (enigma "Não seguro! http://din.uem.br\nSua conexão com esse site não é segura. É recomendado não fornecer informações confidenciais a esse site (por exemplo, senhas ou cartões de crédito), porque elas podem ser roubadas por invasores."
                                          "https://din.uem.br"
@@ -163,57 +229,50 @@
 
 ;; Objetos
 
-(define teclado-desgastado (objeto "Teclado Desgastado" 
-                                   "Um teclado velho e usado, com algumas teclas apagadas. Pode ser útil para inserir comandos." 
-                                   (list))) ;(list digitar-comando examinar-simbolos)))
-
-(define painel-controle (objeto "Painel de Controle" 
-                                "Um painel com diversas luzes e botões. Ele monitora e gerencia o acesso ao sistema." 
-                                (list))) ;(list reiniciar-sistema destrancar-data-center inserir-cod-acesso)))
 
 (define monitor-rede (objeto "Monitor de Rede" 
                              "Um monitor que exibe conexões de rede e informações em tempo real." 
-                             (list))) ;(list consultar-historico explorar-vulnerabilidades)))
+                             (list consultar-historico explorar-vulnerabilidades))) ; interacoes
 
 (define servidor-principal (objeto "Servidor Principal" 
                                    "A peça central do sistema. Um terminal exibe informações críticas e opções avançadas de acesso." 
-                                   (list))) ;(list insepcionar-logs descripto-senha)))
+                                   (list insepcionar-logs descripto-senha)))
 
 (define estacao-trabalho (objeto "Estação de Trabalho" 
                                  "Uma estação com múltiplos monitores exibindo gráficos, logs de rede e alertas de segurança." 
-                                 (list))) ;(list analisar-trafego identificar-anomalos)))
+                                 (list analisar-trafego identificar-anomalos)))
 
 (define cabos-soltos (objeto "Cabos Soltos"
                              "Cabos espalhados pela sala, parcialmente desconectados. Eles fazem parte de um sistema mais complexo, devem ser ligados na sequência certa." 
-                             (list))) ;(list reconectar-cabos)
+                             (list arrumar-cabos)))
 
 (define painel-controle-energia (objeto "Painel de Controle de Energia"
                                         "Um painel de controle com diversos botões e luzes piscando. Para um sistema de energia instável, o painel é a chave para restaurar a energia." 
-                                        (list))) ;(list restaurar-energia)))
+                                        (list arrumar-energia)))
 
 (define gerador-principal (objeto "Gerador Principal"
                                   "O gerador garante o fornecimento de energia sempre que há falhas na corrente elétrica, assegurando a continuidade do sistema." 
-                                  (list))) ;(list restaurar-gerador)))
+                                  (list restaurar-gerador)))
 
 (define computadores-especializados (objeto "Computadores Especializados"
                                             "Uma estação de computadores com software avançado projetada para tarefas de criptografia e análise de dados."
-                                            (list))) ;(list acessar-ferramentas-cripto decifrar-mensagem-cifrada)))
+                                            (list acessar-ferramentas-cripto decifrar-mensagem-cifrada)))
 
 (define livros-criptografia (objeto "Livros de Criptografia"
                                     "Uma coleção de livros e manuais detalhando técnicas e algoritmos criptográficos, tanto clássicos quanto modernos."
-                                    (list))) ;(list consultar-livros buscar-tecnica-cripto)))
+                                    (list consultar-livros buscar-tecnica-cripto)))
 
 (define quadro-branco (objeto "Quadro Branco com Anotações"
                               "Um quadro branco cheio de anotações."
-                              (list))) ;(list analisar-anotacoes resolver-quebra-cabeca)))
+                              (list analisar-anotacoes resolver-quebra-cabeca)))
 
 (define computador-rival (objeto "Computador do Rival"
                                  "Um computador altamente protegido, com várias camadas de segurança. O sistema precisa ser acessado para desativar o controle do hacker rival."
-                                 (list))) ;(list quebrar-senha desativar-sistema)))
+                                 (list quebrar-senha desativar-sistema)))
 
 (define telas-monitoramento (objeto "Telas de Monitoramento"
                                     "Uma série de telas mostrando dados do sistema e da rede. Elas escondem informações cruciais."
-                                    (list))) ;(list resgatar-arquivo)))
+                                    (list resgatar-arquivo)))
 
 ;; Ambientes
 
@@ -243,7 +302,7 @@
 
 (define data-center (ambiente "Data Center" "Descrição do Data Center"
                               (list teclado-desgastado painel-controle monitor-rede) ; objetos
-                              (list arquivo-criptografado quebrar-senha explorar-vulnerabilidade) ; enigmas
+                              (list arquivo-criptografado quebrar-senha brecha-sistema) ; enigmas
                               lab-cripto #f
                               #f))
 
@@ -252,3 +311,136 @@
                                 (list ); enigmas
                                 data-center porao-energia
                                 #t))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Interações 
+
+
+           
+;; Interações possíveis com o objeto "Monitor de Rede"
+(define (explorar-vulnerabilidades jogador ambiente)
+  (if (member "http://din.uem.br" (jogador-inventario jogador))
+      (begin
+        (displayln "Explorando vulnerabilidades...")
+        (iniciar-enigma brecha-sistema jogador))
+      (begin
+        (displayln "Você precisa do 'http://din.uem.br' no seu inventário para explorar vulnerabilidades.")
+        (list jogador ambiente)))) ; Caso o jogador não tenha o item, nada muda
+
+
+;; Interações possíveis com o objeto "Servidor Principal"
+(define (descripto-senha jogador ambiente)
+  (displayln "Descriptografando senha...")
+  (iniciar-enigma descriptografar-senha jogador))
+
+
+;; Interações possíveis com o objeto "Estação de Trabalho"
+(define (analisar-trafego jogador ambiente)
+  (displayln "Analisando tráfego de rede...")
+  (iniciar-enigma reconhecimento-ip jogador))
+
+(define (identificar-anomalos jogador ambiente)
+  (if (member "IP Anômalo" (jogador-inventario jogador))
+      (begin
+        (let* ([jogador-atualizado 
+                (atualiza 'inventario jogador "IP Anômalo")] ; remove IP Anômalo
+               [jogador-atualizado-completo
+                (atualiza 'inventario jogador-atualizado "IP Local")] ; remove IP Local
+               [jogador-atualizado-final
+                (atualiza 'inventario jogador-atualizado-completo "Senha do servidor")]) ; remove Senha do servidor
+          (list jogador-atualizado-final ambiente))) ; retorna o jogador atualizado e o ambiente
+      (begin
+        (displayln "Nenhum IP Anômalo encontrado.") 
+        (list jogador ambiente)))) 
+
+
+;; Interações possíveis com o objeto "Cabos Soltos"
+(define (arrumar-cabos jogador ambiente)
+  (displayln "Reconectando cabos...")
+  (iniciar-enigma reconectar-cabos jogador))
+
+
+;; Interações possíveis com o objeto "Controle de Energia"
+(define (arrumar-energia jogador ambiente)
+  (displayln "Restaurando energia...")
+  (iniciar-enigma restaurar-energia))
+
+;; Interações possíveis com o objeto "Gerador Principal"
+(define (restaurar-gerador jogador ambiente)
+  (if (member "Código do gerador" (jogador-inventario jogador))
+      (begin
+        (let ([jogador-atualizado 
+               (atualiza 'inventario jogador "Código do gerador")]) ; remove Código do gerador
+          (let ([jogador-atualizado-completo
+                 (atualiza 'inventario jogador-atualizado "Código para reiniciar o sistema")]) ; remove Código para reiniciar o sistema
+            (let ([jogador-atualizado-final
+                   (atualiza 'inventario jogador-atualizado-completo "Sequência de cabos correta")]) ; remove Sequência de cabos correta
+              (list jogador-atualizado-final ambiente)))))
+      (begin
+        (displayln "Você precisa do Código do gerador.")
+        (list jogador ambiente))))
+
+  
+;; Interações possíveis com o objeto "Computadores Especializados"
+(define (acessar-ferramentas-cripto jogador ambiente)
+  (displayln "Acessando ferramentas de criptografia..."))
+
+(define (decifrar-mensagem-cifrada jogador ambiente)
+  (displayln "Decifrando mensagem cifrada..."))
+
+
+;; Interações possíveis com o objeto "Livros de Criptografia"
+(define (consultar-livros jogador ambiente)
+  (displayln "Consultando livros de criptografia..."))
+
+(define (buscar-tecnica-cripto jogador ambiente)
+  (displayln "Buscando técnica de criptografia..."))
+
+  
+;; Interações possíveis com o objeto "Quadro Branco"
+(define (analisar-anotacoes jogador ambiente)
+  (displayln "Analisando anotações no quadro..."))
+
+(define (resolver-quebra-cabeca jogador ambiente)
+  (if (member "Chave Sala do Hacker Rival" (jogador-inventario jogador))
+      (begin
+        (let ([jogador-atualizado 
+               (atualiza 'inventario jogador "Chave Sala do Hacker Rival")]) ; remove a chave da sala do Hacker Rival
+          (let ([jogador-atualizado-completo
+                 (atualiza 'inventario jogador-atualizado "Ferramentas de Substituição por Palavra-Chave")]) ; remove Ferramentas de Substituição por Palavra-Chave
+            (let ([jogador-atualizado-final
+                   (atualiza 'inventario jogador-atualizado-completo "Técnica de decodificação Vigenère")]) ; remove Técnica de decodificação Vigenère
+              (let ([ambiente-atualizado 
+                     (atualiza 'estado ambiente #t)]) ; libera o acesso à sala do Hacker Rival
+                (displayln "O item 'Chave Sala do Hacker Rival' foi removido do seu inventário")
+                (displayln "Acesso à Sala do Hacker Rival liberado!")
+                (list jogador-atualizado-final ambiente-atualizado))))))
+      (begin
+        (displayln "Você precisa da chave para abrir a Sala do Hacker Rival.")
+        (list jogador ambiente))))
+
+  
+;; Interações possíveis com o objeto "Computador do Rival"
+(define (quebrar-senha jogador ambiente)
+  (displayln "Quebrando a senha do sistema do rival..."))
+
+(define (desativar-sistema jogador ambiente)
+  (displayln "Desativando sistema do rival..."))
+
+;; Interações possíveis com o objeto "Telas de Monitoramento"
+(define (resgatar-arquivo jogador ambiente)
+  (if (member "Comando correto para desligar o sistema" (jogador-inventario jogador))
+      (begin
+        (let ([jogador-atualizado 
+               (atualiza 'inventario jogador "Comando correto para desligar o sistema")]) ; remove o comando correto
+          (let ([jogador-atualizado-completo
+                 (atualiza 'inventario jogador-atualizado "Acesso ao computador do hacker rival")]) ; remove o acesso ao computador
+            (displayln "O arquivo crucial foi resgatado com sucesso!")
+            (list jogador-atualizado-completo ambiente))))
+      (begin
+        (displayln "Você precisa do comando correto para desligar o sistema do rival.")
+        (list jogador ambiente)))) 
