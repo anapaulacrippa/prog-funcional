@@ -18,43 +18,43 @@
 (define (destrancar-data-center jogador ambiente)
   (if (member "Chave Data Center" (jogador-inventario jogador)) 
       (begin
-        (let* ([jogador-atualizado 
-                (atualiza 'inventario jogador "Chave Data Center")] ; remove a chave do inventário
-               [jogador-atualizado-completo
-                (atualiza 'inventario jogador-atualizado "http://din.uem.br")] ; remove o site do Din do inventário
-               [jogador-atualizado-final
-                (atualiza 'inventario jogador-atualizado-completo "Senha do arquivo")] ; remove a "senha do arquivo"
-               [ambiente-atualizado 
-                (atualiza 'estado ambiente #t)]) ; atualiza o estado do ambiente
+        (let* ([jogador-atualizado (atualiza 'inventario jogador "Chave Data Center")] ; remove a chave do inventário
+               [ambiente-atualizado (atualiza 'objetos ambiente (list painel-controle))]
+               [ambiente-atualizado-enigmas (atualiza 'enigmas ambiente-atualizado (list arquivo-criptografado))])
           (displayln "O item 'Chave Data Center' foi removido do seu inventário")
           (displayln "O Data Center foi destrancado!")
-          (list jogador-atualizado-final ambiente-atualizado)))
+          (iniciar-enigma descriptografar-senha jogador-atualizado)))
       (begin
         (displayln "Você precisa de uma chave para destrancar o Data Center.")
         (list jogador ambiente)))) ; jogador e data-center não são alterados
-
 
 (define (inserir-cod-acesso jogador ambiente)
   (if (member "Senha do arquivo" (jogador-inventario jogador))
       (begin
         (displayln "Inserindo código de acesso...")
         (displayln "Arquivo desbloqueado com sucesso.")
-        (iniciar-enigma quebrar-senha jogador)) 
+        (let* ([jogador-atualizado (atualiza 'inventario jogador "Senha do arquivo")]
+               [ambiente-atualizado (atualiza 'objetos ambiente (list teclado-desgastado))]
+               [ambiente-atualizado-enigmas (atualiza 'enigmas ambiente-atualizado (list arquivo-criptografado))])
+          (iniciar-enigma quebrar-senha jogador-atualizado)))
       (begin
         (displayln "Você precisa da senha do arquivo para desbloqueá-lo.")
-        (list jogador ambiente)))) 
+        (list jogador ambiente))))
 
-           
+
 ;; Interações possíveis com o objeto "Monitor de Rede"
 (define (explorar-vulnerabilidades jogador ambiente)
   (if (member "http://din.uem.br" (jogador-inventario jogador))
       (begin
         (displayln "Explorando vulnerabilidades...")
-        (iniciar-enigma explorar-vulnerabilidade jogador))
+        (let* ([jogador-atualizado (atualiza 'inventario jogador "http://din.uem.br")]
+               [ambiente-atualizado (atualiza 'objetos ambiente (list monitor-rede))]
+               [ambiente-atualizado-enigmas (atualiza 'enigmas ambiente-atualizado (list quebrar-senha))])           
+        (iniciar-enigma explorar-vulnerabilidade jogador-atualizado)))
       (begin
         (displayln "Você precisa do 'http://din.uem.br' no seu inventário para explorar vulnerabilidades.")
         (list jogador ambiente)))) ; Caso o jogador não tenha o item, nada muda
-
+;; ATE AQUI TA TUDO OK (EM TESE)
 
 ;; Interações possíveis com o objeto "Servidor Principal"
 (define (descripto-senha jogador ambiente)
