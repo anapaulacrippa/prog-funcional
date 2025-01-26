@@ -47,13 +47,21 @@
     ;; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
     [(equal? campo 'objetos)
-     (let ([ambiente-atualizado (struct-copy ambiente struct
-                                                [objetos novo-valor])])
+     (let ([ambiente-atualizado
+            (if (member novo-valor (ambiente-objetos struct))  ; se o objeto já estiver no ambiente
+                
+                (struct-copy ambiente struct [objetos (filter (λ (objeto) (not (equal? objeto novo-valor))) (ambiente-objetos struct))]) ; remove o objeto
+                
+                (struct-copy ambiente struct [objetos (append (ambiente-objetos struct) novo-valor)]))]) ; caso contrário, adiciona o objeto
           ambiente-atualizado)]
 
     [(equal? campo 'enigmas)
-     (let ([ambiente-atualizado (struct-copy ambiente struct
-                                                [enigmas novo-valor])])
+     (let ([ambiente-atualizado
+            (if (member novo-valor (ambiente-enigmas struct))  ; se o enigma já estiver presente
+                
+                (struct-copy ambiente struct [enigmas (filter (λ (enigma) (not (equal? enigma novo-valor))) (ambiente-enigmas struct))]) ; remove o enigma
+                
+                (struct-copy ambiente struct [enigmas (append (ambiente-enigmas struct) novo-valor)]))]) ; caso contrário, adiciona o enigma
           ambiente-atualizado)]
 
     [(equal? campo 'estado)
