@@ -27,7 +27,8 @@
 ;;   descricao: String        - detalhes sobre o objeto.
 ;;   interacao: procedure     - ação que pode ser realizada a partir do objeto. Podem iniciar enigmas. 
 
-(struct ambiente (nome descricao objetos enigmas saida) #:transparent)
+(struct ambiente (nome descricao objetos saida) #:transparent)
+;(struct ambiente (nome descricao objetos enigmas saida) #:transparent)
 ;; Um ambiente representa uma sala que contém objetos interativos, enigmas e conexões com outros ambientes.
 ;;   nome     : String             - nome do ambiente.
 ;;   descricao: String             - detalhes sobre o ambiente.
