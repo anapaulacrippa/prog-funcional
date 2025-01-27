@@ -1,10 +1,17 @@
 #lang racket
 
+;; Universidade Estadual de Maringá
+;; Programação Funcional
+;;
+;; Trabalho 2 - Simulador de Escape Room - Tema: Hacker vs. Hacker
+;; Ana Paula Loureiro Crippa
+;; Pâmela Camilo Chalegre
+
 (provide (all-defined-out))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Estruturas
+;; Tipos Abstratos de Dados - Estruturas
 
 (struct jogador (nome inventario pontos-vida localizacao) #:transparent)
 ;; Um jogador é o participante do jogo.
@@ -28,10 +35,8 @@
 ;;   interacao: procedure     - ação que pode ser realizada a partir do objeto. Podem iniciar enigmas. 
 
 (struct ambiente (nome descricao objetos saida) #:transparent)
-;(struct ambiente (nome descricao objetos enigmas saida) #:transparent)
 ;; Um ambiente representa uma sala que contém objetos interativos, enigmas e conexões com outros ambientes.
 ;;   nome     : String             - nome do ambiente.
 ;;   descricao: String             - detalhes sobre o ambiente.
 ;;   objetos  : (list objeto)      - objetos presentes para interação.
-;;   enigmas  : (list enigma)      - enigmas associados ao ambiente.
 ;;   saida    : ambiente | Boolean - direção possível para outros ambientes. Caso não haja saída disponível, representado por #f.
