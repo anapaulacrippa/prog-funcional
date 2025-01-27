@@ -4,7 +4,6 @@
 (require "tad.rkt")
 (provide (all-defined-out))
 
-
 ;; Campo  Struct  (list Any) | Any -> Struct
 ;;
 ;; Atualiza um campo especificado de uma struct, de acordo com o novo valor informado.
@@ -34,46 +33,6 @@
     [(equal? campo 'pontos-vida)
      (let ([jogador-atualizado (struct-copy jogador struct [pontos-vida (- (jogador-pontos-vida struct) 1)])])
        jogador-atualizado)]
-
-    ;; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ;;
-    ;; JUNTAR TODAS AS 3 CLÁUSULAS ABAIXO, ELAS FAZEM A MESMA COISA NO AMBIENTE
-    ;;
-    ;; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    #|
-    [(equal? campo 'objetos)
-     (let ([ambiente-atualizado (struct-copy ambiente struct
-                                                [objetos novo])])
-          ambiente-atualizado)]
-
-    [(equal? campo 'enigmas)
-     (let ([ambiente-atualizado (struct-copy ambiente struct
-                                                [enigmas novo])])
-          ambiente-atualizado)]
-    |#
-    
-    [(equal? campo 'objetos)
-     (let ([ambiente-atualizado (struct-copy ambiente struct
-                                                [objetos novo])])
-     (let ([ambiente-atualizado
-            (if (member novo (ambiente-objetos struct))  ; se o objeto já estiver no ambiente
-                
-                (struct-copy ambiente struct [objetos (filter (λ (objeto) (not (equal? objeto novo))) (ambiente-objetos struct))]) ; remove o objeto
-                
-                (struct-copy ambiente struct [objetos (append (ambiente-objetos struct) novo)]))]) ; caso contrário, adiciona o objeto
-          ambiente-atualizado))]
-
-    #| [(equal? campo 'enigmas)
-        (let ([ambiente-atualizado (struct-copy ambiente struct
-                                                   [enigmas novo])])
-        (let ([ambiente-atualizado
-               (if (member novo (ambiente-enigmas struct))  ; se o enigma já estiver presente
-                   
-                   (struct-copy ambiente struct [enigmas (filter (λ (enigma) (not (equal? enigma novo))) (ambiente-enigmas struct))]) ; remove o enigma
-                   
-                   (struct-copy ambiente struct [enigmas (append (ambiente-enigmas struct) novo)]))]) ; caso contrário, adiciona o enigma
-          ambiente-atualizado))] |#
     ))
 
 ;; Enigma  String  Jogador -> Jogador
@@ -144,13 +103,12 @@
 
 (define (navegar ambiente jogador)
   (cond
-    [(false? ambiente)
+    [(false? (ambiente-saida ambiente))
      (displayln "GAME WIN! Parabéns! Você concluiu o jogo com êxito!\nFeito com <3 por Ana Paula e Pâmela")]
     [else
      (display (ambiente-nome (ambiente-saida ambiente)))
      (displayln (ambiente-descricao ambiente))
-     (explorar ambiente (atualiza 'localizacao jogador ambiente))]
-    ))
+     (explorar ambiente (atualiza 'localizacao jogador ambiente))]))
 
 (define (explorar sala jogador)
   (cond
@@ -183,16 +141,9 @@
   ; explicação do inventario, qtde de pontos de vida e localização inicial
   (displayln (string-append "\nOlá, " nome-escolhido "!\n\n\tVocê possui um inventário para guardar objetos valiosos para explorar o sistema, mas inicialmente ele está vazio.\n\n\tVocê possui 10 pontos de vida, que são subtraídos a cada tentativa incorreta nas soluções dos enigmas.\n\n\tPara cada enigma são disponibilizadas 3 pistas para te ajudar (elas não interferem nos pontos de vida).\n\nVocê está na Sala de Controle."))
 
-  ; função recursiva que faz o loop do jogo
-  ;(define (loop-jogo jogador)
+  ; exploração dos ambientes, partindo da Sala de Controle
   (displayln (ambiente-descricao sala-controle))
-  (explorar (jogador-localizacao player) player)
-
-   ; )
-
-  ;(loop-jogo player)
-  )
-
+  (explorar (jogador-localizacao player) player))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -239,15 +190,14 @@
 ;; Jogador Ambiente -> Enigma | Jogador
 ;;
 ;; Representa uma interação possível com o objeto "Cabos Soltos".
-;; Inicia o enigma "Reconectar cabos".
+;; Inicia o enigma "Reconectar Cabos".
 
 (define (arrumar-cabos jogador ambiente)
-  (displayln "Reconectando cabos...")
-  (iniciar-enigma reconectar-cabos jogador))
+  (displayln "Reconectando cabos...") (iniciar-enigma reconectar-cabos jogador))
 
 ;; Objeto 1
 (define cabos-soltos (objeto "Cabos Soltos" "\nCabos espalhados pela sala, parcialmente desconectados. Eles fazem parte de um sistema mais complexo, devem ser ligados na sequência certa." 
-                             arrumar-cabos))
+                             arrumar-cabos))  ; interação
 
 ;; Enigma 1
 (define reconectar-cabos (enigma "\nQuatro cabos coloridos (Azul, Amarelo, Vermelho, Verde) estão desconectados.\nVocê precisa conectá-los na sequência certa usando '->' para evitar uma sobrecarga."
@@ -264,8 +214,7 @@
 ;; Inicia o enigma "Restaurar Energia".
 
 (define (arrumar-energia jogador ambiente)
-  (displayln "Restaurando energia...")
-  (iniciar-enigma restaurar-energia jogador))
+  (displayln "Restaurando energia...") (iniciar-enigma restaurar-energia jogador))
 
 ;; Objeto 2
 (define painel-controle-energia (objeto "Painel de Controle de Energia" "\nUm painel de controle com diversos botões e luzes piscando. Para um sistema de energia instável, o painel é a chave para restaurar a energia." 
@@ -280,9 +229,11 @@
                                   "Energia restaurada no sistema! O código para reiniciar o sistema foi adicionado ao seu inventário."
                                   (list "Código para reiniciar o sistema: 2306")))
 
+;; Jogador Ambiente -> Enigma | Jogador
+;;
+;; Representa uma interação possível com o objeto "Gerador Principal".
+;; Inicia o enigma "Ativar Gerador".
 
-;; Interação 3 - Ativar o gerador
-;; Interações possíveis com o objeto "Gerador Principal"
 (define (restaurar-gerador jogador ambiente)
   (displayln "Restaurando e ativando gerador...")
   (iniciar-enigma ativar-gerador jogador))
@@ -302,7 +253,6 @@
 
 (define porao-energia (ambiente "Porão de Energia" "Local onde você restaura a energia (não a sua). Os geradores antigos e os paineis piscando mostram que há algo fora do lugar."
                                    (list cabos-soltos ) ; objetos
-                                   ;(list reconectar-cabos ) ; enigmas
                                    #f ; lab-cripto ; saída possível
                                    ))
 
@@ -316,8 +266,7 @@
 ;; Inicia o enigma "Descriptografar Senha".
 
 (define (descobrir-senha jogador ambiente)
-  (displayln "\nDescriptografando senha...")
-  (iniciar-enigma descriptografar-senha jogador))
+  (displayln "\nDescriptografando senha...") (iniciar-enigma descriptografar-senha jogador))
 
 ;; Objeto 1
 (define servidor-principal (objeto "Servidor Principal" "\nA peça central do sistema. Um terminal exibe informações críticas e opções avançadas de acesso." 
@@ -356,7 +305,6 @@
 
 (define data-center (ambiente "Data Center" "\nAqui fica o servidor principal do sistema e você pode coletar dados críticos"
                               (list servidor-principal estacao-trabalho)  ; objetos
-                              ;(list descriptografar-senha identificar-anomalo)  ; enigma
                               porao-energia))  ; saída possível
                               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -401,7 +349,7 @@
                               (list "1:\nQuando as coisas parecem estar fora de ordem, lembre-se: às vezes, reverter é a chave para o progresso."
                                     "2:\nO segredo está no inverso da ordem usual. Se o alfabeto fosse uma estrada, imagine percorrê-la de costas. O final pode ser mais próximo do que parece."
                                     "3:\nNo espelho, a ordem se inverte. Tente olhar para o alfabeto de um outro lado.")
-                              "O endereço do site (seguro) do DIN foi adicionado ao seu inventário. Seja cauteloso! :O"
+                              "O endereço do site (inseguro) do DIN foi adicionado ao seu inventário. Seja cauteloso! :O"
                               (list "http://din.uem.br")))
 
 ;; Jogador Ambiente -> Enigma | Jogador
@@ -427,5 +375,4 @@
 
 (define sala-controle (ambiente "Sala de Controle" "\nO ponto de partida, onde você fará análises e monitoramentos do sistema."
                                 (list teclado-desgastado painel-controle monitor-rede)  ; objetos
-                                ;(list arquivo-criptografado quebrar-senha explorar-vulnerabilidades)  ; enigmas
                                 data-center))  ; saída disponível                                
