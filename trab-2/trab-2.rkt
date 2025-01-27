@@ -1,7 +1,15 @@
 #lang racket
 
-(require examples)
-(require "tad.rkt")
+;; Universidade Estadual de Maringá
+;; Programação Funcional
+;;
+;; Trabalho 2 - Simulador de Escape Room - Tema: Hacker vs. Hacker
+;; Ana Paula Loureiro Crippa
+;; Pâmela Camilo Chalegre
+;;
+;; Para executar o programa, basta utilizar o método (executar-jogo) no terminal.
+
+(require examples "tad.rkt")
 (provide (all-defined-out))
 
 ;; Campo  Struct  (list Any) | Any -> Struct
@@ -12,28 +20,16 @@
 (define (atualiza campo struct novo)
   (cond
     [(equal? campo 'nome)
-     (let ([jogador-atualizado (struct-copy jogador struct
-                                                    [nome novo])])
-              jogador-atualizado)]
-    
+     (let ([jogador-atualizado (struct-copy jogador struct [nome novo])]) jogador-atualizado)]
     [(equal? campo 'inventario)
-     (let ([jogador-atualizado
-            (if (member novo (jogador-inventario struct))  ; se o item já estiver no inventário
-                
-                (struct-copy jogador struct [inventario (filter (λ (item) (not (equal? item novo))) (jogador-inventario struct))]) ; remove o item
-                
-                (struct-copy jogador struct [inventario (append (jogador-inventario struct) novo)]))]) ; caso contrário, adiciona o item
+     (let ([jogador-atualizado (if (member novo (jogador-inventario struct))  ; se o item já estiver no inventário
+                                   (struct-copy jogador struct [inventario (filter (λ (item) (not (equal? item novo))) (jogador-inventario struct))])  ; remove o item
+                                   (struct-copy jogador struct [inventario (append (jogador-inventario struct) novo)]))])  ; caso contrário, adiciona o item
        jogador-atualizado)]
-
     [(equal? campo 'localizacao)
-     (let ([jogador-atualizado (struct-copy jogador struct
-                                               [localizacao novo])])
-          jogador-atualizado)]
-    
+     (let ([jogador-atualizado (struct-copy jogador struct [localizacao novo])]) jogador-atualizado)]
     [(equal? campo 'pontos-vida)
-     (let ([jogador-atualizado (struct-copy jogador struct [pontos-vida (- (jogador-pontos-vida struct) 1)])])
-       jogador-atualizado)]
-    ))
+     (let ([jogador-atualizado (struct-copy jogador struct [pontos-vida (- (jogador-pontos-vida struct) 1)])]) jogador-atualizado)]))
 
 ;; Enigma  String  Jogador -> Jogador
 ;;
@@ -96,38 +92,41 @@
                                   (string-upcase (objeto-nome objeto))))
             objetos)))  ; retorna a lista filtrada diretamente
 
-
-;; Ambiente  Jogador -> Jogador
+;; Ambiente  Jogador -> Jogador | Void
 ;;
-;; Recebe o ambiente de destino do jogador, o atualiza para esse novo local e 
+;; Recebe o ambiente de destino do jogador, o atualiza para esse novo local e o leva à exploração do ambiente novamente.
+;; Caso o destino não exista, o jogo é finalizado.
 
 (define (navegar ambiente jogador)
   (cond
     [(false? (ambiente-saida ambiente))
-     (displayln "GAME WIN! Parabéns! Você concluiu o jogo com êxito!\nFeito com <3 por Ana Paula e Pâmela")]
+     (displayln "\n***************************************************************************************************************************************************\n\nGAME WIN !!!!!!\nParabéns!\nVocê concluiu o jogo com êxito!\n\nFeito com <3 por Ana Paula e Pâmela.")]
     [else
      (display (ambiente-nome (ambiente-saida ambiente)))
      (displayln (ambiente-descricao ambiente))
      (explorar ambiente (atualiza 'localizacao jogador ambiente))]))
+
+;; Ambiente  Jogador -> Jogador | Void
+;;
+;; Gerencia a exploração dos ambientes e a interação com os objetos.
 
 (define (explorar sala jogador)
   (cond
     ; finalizaram as interações possíveis
     [(null? (ambiente-objetos sala))
      (displayln "\nSuas tarefas nesse ambiente foram finalizadas! :D\nSua próxima direção é:")
-     ; leva o jogador para o ambiente seguinte
-     (navegar (ambiente-saida sala) jogador)]
+     (navegar (ambiente-saida sala) jogador)]  ; leva o jogador para o ambiente seguinte
     [else
      ; ainda há interações possíveis
      (displayln "\nVocê vê os seguintes objetos:") (for-each displayln (map objeto-nome (ambiente-objetos sala)))
-     (displayln "\nDigite o nome do objeto que deseja explorar")
-     (define obj (first (busca-objeto sala (read-line))))  ; acessa o objeto a ser explorado
+     (displayln "\nDigite o nome do objeto que deseja explorar") (define obj (first (busca-objeto sala (read-line))))  ; acessa o objeto a ser explorado
      (displayln (objeto-descricao obj))
      (define jog-atual ((objeto-interacao obj) jogador sala))  ; interação do objeto escolhido e chamada para o enigma
-     (explorar (struct-copy ambiente sala [objetos (remove obj (ambiente-objetos sala))]) ; com o enigma resolvido, remove-se o objeto do ambiente
-               jog-atual)]
-  ))
-
+     (explorar (struct-copy ambiente sala [objetos (remove obj (ambiente-objetos sala))]) jog-atual)]))  ; com o enigma resolvido, remove-se o objeto do ambiente
+             
+;; Void -> Void
+;;
+;; Responsável por introduzir o jogador e iniciar o jogo, chamando outros métodos para isso.
 
 (define (executar-jogo)
   ; explicação inicial do funcionamento do jogo
@@ -152,36 +151,144 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; (1) SALA DO HACKER RIVALS
+;; (1) SALA DO HACKER RIVAL
 
-;; Interação 1
+;; Jogador Ambiente -> Enigma | Jogador
+;;
+;; Representa uma interação possível com o objeto "Computador do Hacker Rival".
+;; Inicia o enigma "Quebrar Senha do Sistema".
+
+(define (descobrir-senha-sistema jogador ambiente)
+  (displayln "Quebrando a senha do sistema do rival...") (iniciar-enigma quebrar-senha-rival jogador))
+
 ;; Objeto 1
+(define computador-rival (objeto "Computador do Rival" "\nUm computador altamente protegido, com várias camadas de segurança. O sistema precisa ser acessado para desativar o controle do hacker rival."
+                                 descobrir-senha-sistema))  ; interação
+
 ;; Enigma 1
+(define quebrar-senha-rival (enigma "\nO computador do rival exige uma senha que combina lógica e observação. Ele esconde algo no número pi...\nDigite a sequência correta para acessar o sistema." 
+                              "314159" 
+                              (list "1:\nUm número infinito, mas basta um começo. São apenas 6 dígitos."
+                                    "2:\nLembre-se: o número pi começa com 3.141592653589793..."
+                                    "3:\nUma constante em círculos, mas que transcende sua forma geométrica.")
+                              "Senha correta! O computador foi desbloqueado com sucesso. A senha de acesso ao computador do hacker rival foi adicionada ao seu inventário." 
+                              (list "Acesso ao computador do hacker rival: 314159")))
 
-;; Interação 2
+;; Jogador Ambiente -> Enigma | Jogador
+;;
+;; Representa uma interação possível com o objeto "Chave Mestra".
+;; Inicia o enigma "Desativar Sistema do Hacker Rival".
+
+(define (desligar-sistema jogador ambiente)
+  (displayln "Desativando sistema do rival...") (iniciar-enigma desativar-sistema jogador))
+
 ;; Objeto 2
+(define chave-mestra (objeto "Chave Mestra" "\nUma chave que representa um acesso total, capaz de desativar qualquer medida de segurança do rival."
+                             desligar-sistema))  ; interação
+
 ;; Enigma 2
+(define desativar-sistema (enigma "\nNo computador do rival, você encontra uma mensagem embaralhada que precisa ser decifrada para desligar o sistema.\n\nMensagem Embaralhada: otudnws -rhesver\n\nInsira o comando correto para desativar o sistema do rival." 
+                                  "shutdown -reverse" 
+                                  (list "1:\nAs letras foram misturadas e comprimidas, mas a mensagem ainda está lá."
+                                        "2:\nProcure por padrões e tente dividir a sequência em palavras."
+                                        "3:\nLembre-se da estrutura comum de comandos de terminal.") 
+                                  "Sistema desativado com sucesso! O computador está desligado." 
+                                  (list "Comando correto para desligar o sistema")))
 
-;; Interação 3
+;; Jogador Ambiente -> Enigma | Jogador
+;;
+;; Representa uma interação possível com o objeto "Telas de Monitoramento".
+;; Inicia o "Enigma Final".
+
+(define (resgatar-arquivo jogador ambiente)
+  (displayln "Resgatando arquivo crucial...") (iniciar-enigma enigma-final jogador))
+  
 ;; Objeto 3
+(define telas-monitoramento (objeto "Telas de Monitoramento" "\nUma série de telas mostrando dados do sistema e da rede. Elas escondem informações cruciais."
+                                    resgatar-arquivo))
 ;; Enigma 3
+(define enigma-final (enigma "\nO destino da missão está em suas mãos. O painel de monitoramento brilha com uma sequência numérica que parece aleatória, mas você sabe que ali se esconde a chave para acessar um arquivo crucial.\nEste é o último obstáculo. O tempo é curto e em breve o acesso ao painel de monitoramento será bloqueado. Você precisa decifrar o padrão escondido na sequência e inserir a resposta antes que seja tarde demais.\n\n-------------- TELA DE MONITORAMENTO ---------------\n|   2   |   4   |   8   |   16   |   32   |   64   |\n----------------------------------------------------\nO sistema está aguardando a próxima entrada na sequência." 
+                             "128" 
+                             (list "1:\nCada número é o dobro do anterior. Pense em como as máquinas armazenam e processam dados." 
+                                   "2:\nA sequência parece simples, mas o próximo número será o próximo na linha, seguindo uma progressão de duplicação." 
+                                   "3:\nOs computadores adoram potências de dois. O que vem depois de 64?") 
+                             "Parabéns, você decifrou o último enigma! O arquivo crucial foi recuperado e o sistema do hacker rival foi desativado. Você completou sua missão com sucesso!" 
+                             (list "Troféu Chave-Mestra da Rede")))
 
+(define sala-rival (ambiente "Sala do Hacker Rival" "Aqui é o núcleo de operações do Hacker Rival. Enfrente-o em um confronto final onde cada movimento conta.\nO destino do sistema está em suas mãos. Derrote o hacker de uma vez por todas e restaure a segurança do sistema!"
+                             (list computador-rival chave-mestra telas-monitoramento) ; objetos
+                             #f))  ; último ambiente, não há saídas disponíveis
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; (2) LABORATÓRIO DE CRIPTOGRAFIA
 
-;; Interação 1
+;; Jogador Ambiente -> Enigma | Jogador
+;;
+;; Representa uma interação possível com o objeto "Computadores Especializados".
+;; Inicia o enigma "Decifrar mensagem criptografada".
+
+(define (descobrir-mensagem jogador ambiente)
+  (displayln "Decifrando mensagem criptografada...") (iniciar-enigma decifrar-mensagem jogador))
+
 ;; Objeto 1
+(define computadores-especializados (objeto "Computadores Especializados" "\nUma estação de computadores com software avançado projetada para tarefas de criptografia e análise de dados."
+                                            descobrir-mensagem))  ; interação
+
 ;; Enigma 1
+(define decifrar-mensagem (enigma "\nUma mensagem enigmática foi interceptada. Ela está cifrada usando a cifra Vigenère.\nMensagem cifrada: UPZVR NQ ZLPUD KRHMQ. Palavra-chave: SECURE."
+                                  "PROTEGER OS DADOS É ESSENCIAL"
+                                  (list "1:\nNem toda cifra é estática. Às vezes, uma palavra é a chave que move os blocos de texto."
+                                        "2:\nVocê está seguro quando conhece a palavra certa. Ela sempre protege sua mensagem."
+                                        "3:\nProcure ferramentas nos computadores, elas podem ajudá-lo a quebrar esta cifra dinâmica.")
+                                  "Mensagem decifrada com sucesso! A técnica de decodificação utilizada foi adiconada ao seu inventário."
+                                  (list "Técnica de decodificação Vigenère")))
 
-;; Interação 2
+;; Jogador Ambiente -> Enigma | Jogador
+;;
+;; Representa uma interação possível com o objeto "Livros de Criptografia".
+;; Inicia o enigma "Buscar Técnica de Criptografia".
+
+(define (encontrar-tecnica jogador ambiente)
+  (displayln "Buscando técnicas e ferramentas de criptografia...") (iniciar-enigma buscar-tecnica-cripto jogador))
+
 ;; Objeto 2
-;; Enigma 2
+(define livros-criptografia (objeto "Livros de Criptografia" "\nUma coleção de livros e manuais detalhando técnicas e algoritmos criptográficos, tanto clássicos quanto modernos."
+                                    encontrar-tecnica))  ; interação
 
-;; Interação 3
+;; Enigma 2
+(define buscar-tecnica-cripto (enigma "\nUm livro de criptografia contém uma técnica rara para proteger informações. Identifique o método descrito."
+                                      "Cifra de Substituição por Palavra-Chave"
+                                      (list "1:\nLetras podem ser reordenadas, mas algumas palavras abrem portas que outras não."
+                                            "2:\nO segredo está em uma combinação única e específica."
+                                            "3:\nA palavra-chave constrói o alfabeto. Observe os exemplos no livro.")
+                                      "Técnica de criptografia identificada com sucesso! Ferramentas de Substituição por Palavra-Chave foram adicionadas ao seu inventário."
+                                      (list "Ferramentas de Substituição por Palavra-Chave")))
+
+;; Jogador Ambiente -> Enigma | Jogador
+;;
+;; Representa uma interação possível com o objeto "Quadro Branco".
+;; Inicia o enigma "Resolver Quebra-Cabeça no Quadro Branco".
+
+(define (observar-quadro-branco jogador ambiente)
+  (displayln "Observando as anotações do quadro branco... parece que há um quebra-cabeça...") (iniciar-enigma resolver-quebra-cabeca jogador))
+
 ;; Objeto 3
+(define quadro-branco (objeto "Quadro Branco com Anotações" "\nUm quadro branco cheio de anotações."
+                              observar-quadro-branco))  ; interação
+
 ;; Enigma 3
+(define resolver-quebra-cabeca (enigma "\nNo quadro branco, há um diagrama confuso de ligações entre servidores.\nDescubra a rota mais segura para transferir dados. Utilize '->' para demonstrar a rota.\n\n+----+     +----+     +----+     +----+\n| A  |---->| B  |---->| C  |---->| D  |\n+----+     +----+     +----+     +----+\n|                          ^\n|                          |\nv                          |\n+----+     +----+     +----+     +----+\n| E  |---->| F  |---->| G  |---->| H  |\n+----+     +----+     +----+     +----+\nA sua tarefa é escolher a rota mais segura entre A e H.\nCuidado com os pontos vulneráveis no caminho!"
+                                       "A -> E -> F -> G -> H"
+                                       (list "1:\nNem sempre o caminho mais curto é o mais seguro."
+                                             "2:\nProcure padrões de proteção. Certifique-se de evitar os pontos vulneráveis."
+                                             "3:\nConsidere as conexões que passam por pontos mais confiáveis e estáveis.")
+                                       "Rota segura identificada com sucesso!"
+                                       (list "Chave da sala do Hacker Rival")))
+
+(define lab-cripto (ambiente "Laboratório de Criptografia" "Espaço dedicado a decodificar mensagens e decifrar códigos"
+                             (list computadores-especializados livros-criptografia quadro-branco) ; objetos
+                             sala-rival))  ; saída possível
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -235,8 +342,7 @@
 ;; Inicia o enigma "Ativar Gerador".
 
 (define (restaurar-gerador jogador ambiente)
-  (displayln "Restaurando e ativando gerador...")
-  (iniciar-enigma ativar-gerador jogador))
+  (displayln "Restaurando e ativando gerador...") (iniciar-enigma ativar-gerador jogador))
 
 ;; Objeto 3
 (define gerador-principal (objeto "Gerador Principal" "O gerador garante o fornecimento de energia sempre que há falhas na corrente elétrica, assegurando a continuidade do sistema." 
@@ -252,10 +358,9 @@
                                (list "Código do gerador: 4815162342")))
 
 (define porao-energia (ambiente "Porão de Energia" "Local onde você restaura a energia (não a sua). Os geradores antigos e os paineis piscando mostram que há algo fora do lugar."
-                                   (list cabos-soltos ) ; objetos
-                                   #f ; lab-cripto ; saída possível
-                                   ))
-
+                                   (list cabos-soltos painel-controle-energia gerador-principal) ; objetos
+                                   lab-cripto))  ; saída possível
+                                   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; (4) DATA CENTER
