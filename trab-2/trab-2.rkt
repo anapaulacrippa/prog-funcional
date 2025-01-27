@@ -64,16 +64,16 @@
                 (struct-copy ambiente struct [objetos (append (ambiente-objetos struct) novo)]))]) ; caso contrário, adiciona o objeto
           ambiente-atualizado))]
 
-    [(equal? campo 'enigmas)
-     (let ([ambiente-atualizado (struct-copy ambiente struct
-                                                [enigmas novo])])
-     (let ([ambiente-atualizado
-            (if (member novo (ambiente-enigmas struct))  ; se o enigma já estiver presente
-                
-                (struct-copy ambiente struct [enigmas (filter (λ (enigma) (not (equal? enigma novo))) (ambiente-enigmas struct))]) ; remove o enigma
-                
-                (struct-copy ambiente struct [enigmas (append (ambiente-enigmas struct) novo)]))]) ; caso contrário, adiciona o enigma
-          ambiente-atualizado))]
+    #| [(equal? campo 'enigmas)
+        (let ([ambiente-atualizado (struct-copy ambiente struct
+                                                   [enigmas novo])])
+        (let ([ambiente-atualizado
+               (if (member novo (ambiente-enigmas struct))  ; se o enigma já estiver presente
+                   
+                   (struct-copy ambiente struct [enigmas (filter (λ (enigma) (not (equal? enigma novo))) (ambiente-enigmas struct))]) ; remove o enigma
+                   
+                   (struct-copy ambiente struct [enigmas (append (ambiente-enigmas struct) novo)]))]) ; caso contrário, adiciona o enigma
+          ambiente-atualizado))] |#
     ))
 
 ;; Enigma  String  Jogador -> Jogador
@@ -199,10 +199,26 @@
 ;;
 ;; Instâncias por ambientes
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; (1) SALA DO HACKER RIVALS
+
+;; Interação 1
+;; Objeto 1
+;; Enigma 1
+
+;; Interação 2
+;; Objeto 2
+;; Enigma 2
+
+;; Interação 3
+;; Objeto 3
+;; Enigma 3
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; (3) LABORATÓRIO DE CRIPTOGRAFIA
+;; (2) LABORATÓRIO DE CRIPTOGRAFIA
 
 ;; Interação 1
 ;; Objeto 1
@@ -218,7 +234,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; (4) PORÃO DE ENERGIA
+;; (3) PORÃO DE ENERGIA
 
 ;; Jogador Ambiente -> Enigma | Jogador
 ;;
@@ -286,13 +302,13 @@
 
 (define porao-energia (ambiente "Porão de Energia" "Local onde você restaura a energia (não a sua). Os geradores antigos e os paineis piscando mostram que há algo fora do lugar."
                                    (list cabos-soltos ) ; objetos
-                                   (list reconectar-cabos ) ; enigmas
+                                   ;(list reconectar-cabos ) ; enigmas
                                    #f ; lab-cripto ; saída possível
                                    ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; (5) DATA CENTER
+;; (4) DATA CENTER
 
 ;; Jogador Ambiente -> Enigma | Jogador
 ;;
@@ -340,12 +356,12 @@
 
 (define data-center (ambiente "Data Center" "\nAqui fica o servidor principal do sistema e você pode coletar dados críticos"
                               (list servidor-principal estacao-trabalho)  ; objetos
-                              (list descriptografar-senha)  ; enigmas
+                              ;(list descriptografar-senha identificar-anomalo)  ; enigma
                               porao-energia))  ; saída possível
                               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; (6) SALA DE CONTROLE
+;; (5) SALA DE CONTROLE
 
 ;; Jogador  Ambiente -> Enigma | Jogador
 ;;
@@ -411,5 +427,5 @@
 
 (define sala-controle (ambiente "Sala de Controle" "\nO ponto de partida, onde você fará análises e monitoramentos do sistema."
                                 (list teclado-desgastado painel-controle monitor-rede)  ; objetos
-                                (list arquivo-criptografado quebrar-senha explorar-vulnerabilidades)  ; enigmas
+                                ;(list arquivo-criptografado quebrar-senha explorar-vulnerabilidades)  ; enigmas
                                 data-center))  ; saída disponível                                
