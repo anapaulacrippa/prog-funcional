@@ -1,0 +1,28 @@
+;; Lista 05 - Autorreferência e Recursividade
+;;
+;; Exercício 19
+
+#lang racket
+
+(require examples)
+
+;; Número Natural -> Boolean
+;;
+;; Verifica se um número natural é ímpar ou par.
+;; A função `impar?` é definida em termos de `par?` e vice-versa, criando uma recursão indireta.
+
+(examples
+ (check-equal? (impar? 0) #f)
+ (check-equal? (impar? 1) #t)
+ (check-equal? (impar? 2) #f)
+ (check-equal? (impar? 3) #t)
+ (check-equal? (par? 0) #t)
+ (check-equal? (par? 1) #f)
+ (check-equal? (par? 2) #t)
+ (check-equal? (par? 3) #f))
+
+(define (impar? n)
+  (if (zero? n) #f (par? (sub1 n)))) ; chama par? com n-1
+
+(define (par? n)
+  (if (zero? n) #t (impar? (sub1 n)))) ; chama impar? com n-1
