@@ -100,7 +100,7 @@
 (define (navegar ambiente jogador)
   (cond
     [(false? (ambiente-saida ambiente))
-     (displayln "\n***************************************************************************************************************************************************\n\nGAME WIN !!!!!!\nParabéns!\nVocê concluiu o jogo com êxito!\n\nFeito com <3 por Ana Paula e Pâmela.")]
+     (displayln "\n***************************************************************************************************************************************************\n\n\n\n\t\tGAME WIN\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n\t\tParabéns!\n\n\n\tVocê concluiu o jogo com êxito!\n\n\n\n\n\nFeito com <3 por Ana Paula e Pâmela.")]
     [else
      (display (ambiente-nome (ambiente-saida ambiente)))
      (displayln (ambiente-descricao ambiente))
@@ -286,7 +286,7 @@
                                        "Rota segura identificada com sucesso!"
                                        (list "Chave da sala do Hacker Rival")))
 
-(define lab-cripto (ambiente "Laboratório de Criptografia" "Espaço dedicado a decodificar mensagens e decifrar códigos"
+(define lab-cripto (ambiente "Laboratório de Criptografia" "\nEspaço dedicado a decodificar mensagens e decifrar códigos"
                              (list computadores-especializados livros-criptografia quadro-branco) ; objetos
                              sala-rival))  ; saída possível
 
@@ -357,7 +357,7 @@
                                "Gerador ativado com sucesso! O sistema está em pleno funcionamento. O código do gerador foi adicionado ao seu inventário."
                                (list "Código do gerador: 4815162342")))
 
-(define porao-energia (ambiente "Porão de Energia" "Local onde você restaura a energia (não a sua). Os geradores antigos e os paineis piscando mostram que há algo fora do lugar."
+(define porao-energia (ambiente "Porão de Energia" "\nLocal onde você restaura a energia (não a sua). Os geradores antigos e os paineis piscando mostram que há algo fora do lugar."
                                    (list cabos-soltos painel-controle-energia gerador-principal) ; objetos
                                    lab-cripto))  ; saída possível
                                    
@@ -454,7 +454,7 @@
                               (list "1:\nQuando as coisas parecem estar fora de ordem, lembre-se: às vezes, reverter é a chave para o progresso."
                                     "2:\nO segredo está no inverso da ordem usual. Se o alfabeto fosse uma estrada, imagine percorrê-la de costas. O final pode ser mais próximo do que parece."
                                     "3:\nNo espelho, a ordem se inverte. Tente olhar para o alfabeto de um outro lado.")
-                              "O endereço do site (inseguro) do DIN foi adicionado ao seu inventário. Seja cauteloso! :O"
+                              "\nO endereço do site (inseguro) do DIN foi adicionado ao seu inventário. Seja cauteloso! :O"
                               (list "http://din.uem.br")))
 
 ;; Jogador Ambiente -> Enigma | Jogador
